@@ -15,11 +15,19 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
+        Console.WriteLine("Index page req");
+        return View();
+    }
+
+    public IActionResult Index2()
+    {
+        Console.WriteLine("Test (Index2)");
         return View();
     }
 
     public IActionResult Privacy()
     {
+        Console.WriteLine("Privacy page req");
         return View();
     }
 
