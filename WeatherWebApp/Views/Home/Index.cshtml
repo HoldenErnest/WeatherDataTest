@@ -1,8 +1,32 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
+    
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Weather Data</h1>
+    <p>Enter a location to get its weather data</p>
+    
+    
+    <form method="post" >
+        <fieldset>
+          <legend>Get Weather Info</legend>
+          <div>
+            <label for="city">City:</label>
+            <input type="text" name="city" value="" required/>
+          </div>
+          <div>
+            <label for="zip">Zip Code:</label>
+            <input type="text" maxlength=5 minlength=5 name="zip" value="" required/>
+          </div>
+          <div>
+            <label for="state">State Code:</label>
+            <input type="text" maxlength=2 minlength=2 name="state" value="" required/>
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <input type="submit" value="Submit" class="submit" />
+          </div>
+        </fieldset>
+      </form>
 </div>
