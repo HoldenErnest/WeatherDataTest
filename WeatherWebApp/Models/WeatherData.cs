@@ -1,5 +1,6 @@
 namespace WeatherWebApp.Models;
 
+[Serializable]
 public class WeatherData
 {
 
@@ -12,9 +13,4 @@ public class WeatherData
     public float windDirection = 0.0f;
     public float cloudCoverage = 0.0f;
     public PrecipitationData[] precipitation = { new PrecipitationData() };
-
-    public override string ToString()
-    {
-        return "Later imp..";
-    }
 }
