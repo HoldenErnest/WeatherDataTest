@@ -8,7 +8,12 @@
 <div class="text-center">
     <h1 class="display-4">Weather Data</h1>
     <p>Weather Data</p>
-    <p>ID: @Model.city</p>
-    <p>Name: @Model.state</p>
-    <p>Price: @Model.zip</p>
+    <p>City: @Model.city</p>
+    <p>State: @Model.state</p>
+    <p>Zip: @Model.zip</p>
+    <p>Temperature: @Model.temperature</p>
+    <p>Wind Speed: @Model.windSpeed</p>
+    <p>Wind Direction: @Model.windDirection</p>
+    <p>Cloud Coverage(%): @Model.cloudCoverage</p>
+    <p>Precipitation Info: @Model.precipitation[0].type (@Model.precipitation[0].probability %)</p>
 </div>
