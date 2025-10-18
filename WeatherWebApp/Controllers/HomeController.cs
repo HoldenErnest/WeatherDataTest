@@ -3,6 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using WeatherWebApp.Models;
 
 using System.Text.Json;
+using Microsoft.AspNetCore.Authentication.BearerToken;
+using System.Net.Http.Headers;
+using System.Text.Unicode;
+using System.Text;
 
 namespace WeatherWebApp.Controllers;
 
@@ -12,8 +16,11 @@ public class HomeController : Controller
 
     private string apiToken = "";
 
-    public HomeController(ILogger<HomeController> logger)
+    private readonly HttpClient _httpClient;
+
+    public HomeController(ILogger<HomeController> logger, HttpClient httpClient)
     {
+        _httpClient = httpClient;
         _logger = logger;
     }
 
@@ -29,10 +36,12 @@ public class HomeController : Controller
     {
         // Access form data through the model object
 
-        if (!await RefreshToken())
-            return Index(); //TODO: Give them an error message
+        WeatherData? data = await GetWeatherData(model);
 
-        WeatherData data = await GetWeatherData(model);
+        if (data == null) { // data could not be fetched properly
+            return Index();
+        }
+        
         HttpContext.Session.SetString("weatherData", JsonSerializer.Serialize(data));
         //TODO: Send to the data to the view
         return RedirectToAction("Weather");
@@ -56,21 +65,69 @@ public class HomeController : Controller
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 
+
+    // Refresh the API Token. Returns false if there is a problem fetching a new token
     private async Task<bool> RefreshToken()
-    { // returns false if there is a problem fetching a new token
+    { 
         Console.WriteLine("Checking token");
         //TODO
+        HttpResponseMessage response = await _httpClient.GetAsync("https://ami-interviewassessment.azurewebsites.net/Auth/AccessToken");
+        if (response == null || !response.IsSuccessStatusCode) return false;
+
+        string apiResponse = await response.Content.ReadAsStringAsync();
+        AccessToken? aTokenObj = JsonSerializer.Deserialize<AccessToken>(apiResponse);
+        if (aTokenObj == null)
+        {
+            Console.WriteLine("API TOKEN could not be parsed");
+            return false;
+        }
+        apiToken = aTokenObj.accessToken;
+
+        Console.WriteLine("New API TOKEN: " + apiToken);
+
         return true;
     }
-    private async Task<WeatherData> GetWeatherData(WeatherData wd)
-    { // returns the response from the API given a (partially completed) WeatherData
-        string city = wd.city!;
-        string state = wd.state!;
-        string zip = wd.zip != null ? wd.zip : "";
+    
+    // returns the response from the API given an input WeatherData
+    private async Task<WeatherData?> GetWeatherData(WeatherData wd)
+    {
 
-        Console.WriteLine("Searching for :: Name: " + city + ", State: " + state + ", Zip: " + zip);
+        if (apiToken == "") await RefreshToken();
 
-        //TODO
-        return wd;
+        //"{ \"locations\": [" + JsonSerializer.Serialize(wd) + "]}"
+        APIInput contentObj = new APIInput(wd, "F");
+
+        StringContent content   = new StringContent(JsonSerializer.Serialize(contentObj), Encoding.UTF8, "application/json");
+
+        // make API call
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiToken);
+        HttpResponseMessage response = await _httpClient.PostAsync("https://ami-interviewassessment.azurewebsites.net/WeatherData/ByLocation", content);
+
+        // if there is a problem with the API, try refreshing the API Token
+        if (response == null || !response.IsSuccessStatusCode)
+        {
+            if (!await RefreshToken()) return null;
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiToken);
+            response = await _httpClient.PostAsync("https://ami-interviewassessment.azurewebsites.net/WeatherData/ByLocation", content);
+
+
+            if (response == null || !response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("API response is bad");
+                return null;
+            }
+        }
+
+        // the response was successful.. parse the data
+        string apiResponse = await response.Content.ReadAsStringAsync();
+        Console.WriteLine("RESPONSE!:: " + apiResponse);
+        WeatherData[]? dataObj = JsonSerializer.Deserialize<WeatherData[]>(apiResponse);
+        if (dataObj == null || dataObj.Length < 1) {
+            Console.WriteLine("Problem Parsing the Weather Data");
+            return null;
+        }
+
+        return dataObj[0];
     }
 }

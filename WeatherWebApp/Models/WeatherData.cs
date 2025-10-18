@@ -8,9 +8,9 @@ public class WeatherData
     public string? zip { get; set; }
     public string? state { get; set; }
     public int[]? rolling12MonthTemps;
-    public int temperature = 0;
-    public int windSpeed = 0;
-    public float windDirection = 0.0f;
-    public float cloudCoverage = 0.0f;
-    public PrecipitationData[] precipitation = { new PrecipitationData() };
+    public int temperature { get; set; }
+    public int windSpeed { get; set; }
+    public float windDirection { get; set; }
+    public float cloudCoverage { get; set; }
+    public PrecipitationData[] precipitation { get; set; }
 }
