@@ -1,14 +1,16 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
-    
 }
+<head>
+  <link rel="stylesheet" href="~/css/index.css" type="text/css" />
+</head>
 
 <div class="text-center">
     <h1 class="display-4">Weather Data</h1>
     <p>Enter a location to get its weather data</p>
     
     
-    <form method="post" >
+    <form method="post" id="theForm" >
         <fieldset>
           <legend>Get Weather Info</legend>
           <div>
@@ -29,4 +31,9 @@
           </div>
         </fieldset>
       </form>
+      
 </div>
+<div class="loader hidden"></div>
+
+<script src="~/js/index.js" asp-append-version="true"></script>
+

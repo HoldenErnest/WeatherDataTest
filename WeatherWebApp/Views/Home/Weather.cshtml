@@ -1,5 +1,6 @@
 ﻿@{
-  ViewData["Title"] = "Home Page";
+  if (ViewData == null) return;
+  ViewData["Title"] = "Weather Data";
     
 }
 
@@ -7,13 +8,30 @@
 
 <div class="text-center">
     <h1 class="display-4">Weather Data</h1>
-    <p>Weather Data</p>
-    <p>City: @Model.city</p>
-    <p>State: @Model.state</p>
-    <p>Zip: @Model.zip</p>
-    <p>Temperature: @Model.temperature</p>
-    <p>Wind Speed: @Model.windSpeed</p>
-    <p>Wind Direction: @Model.windDirection</p>
-    <p>Cloud Coverage(%): @Model.cloudCoverage</p>
-    <p>Precipitation Info: @Model.precipitation[0].type (@Model.precipitation[0].probability %)</p>
+    <p>City: <strong>@Model.city</strong></p>
+    <p>State: <strong>@Model.state</strong></p>
+    <p>Zip: <strong>@Model.zip</strong></p>
+    <p>Temperature: <strong>@Model.temperature °F</strong></p>
+    <p>Wind Speed: <strong>@Model.windSpeed mph</strong></p>
+    <p>Wind Direction: <strong>@Model.windDirection °</strong></p>
+    <p>Cloud Coverage: <strong>@Model.cloudCoverage %</strong></p>
+    @if (Model.precipitation!.Length > 0) {
+      <p>Precipitation Info: <strong>@Model.precipitation![0].type (@Model.precipitation![0].probability %)</strong></p>
+    }
+    @if (Model.rolling12MonthTemps != null && Model.rolling12MonthTemps.Length > 0) {
+      <p>Temps in the last 12 months: </p>
+      <table style="margin:auto;">
+        <tr style="border-bottom: 1px solid black;">
+          <th>Months ~</th>
+          <th>Temp</th>
+        </tr>
+      @for(int i=0;i< Model.rolling12MonthTemps.Length; i++)
+      {
+        <tr>
+          <td>@(i+1)</td>
+          <td>@Model.rolling12MonthTemps[i] °F</td>
+        </tr>
+      }
+      </table>
+    }
 </div>
